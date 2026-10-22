@@ -5,7 +5,8 @@
 > Its single purpose is to publish `flownexai/php:8.1-*`: the same images with PHP 8.1.34 patched for
 > CVE-2026-109618 / CVE-2026-109619, which has no official release because PHP 8.1 is end-of-life
 > (see [PHP 8.1 security backport](#php-81-security-backport-this-fork)). The images are currently
-> **linux/arm64 only**. For every other PHP version use the upstream `shinsenter/php` images, which are
+> **linux/arm64 only** and **Debian trixie only** (no Alpine or Ubuntu variants). For every other PHP
+> version use the upstream `shinsenter/php` images, which are
 > kept up to date by the original author. Everything below this notice is the upstream documentation.
 
 Our images support PHP versions from 5.6 up to 8.6 (RC), with variants for CLI, ZTS, FPM, FPM/Apache, FPM/Nginx, RoadRunner, and FrankenPHP. Images are available for both Debian and Alpine.
@@ -74,8 +75,9 @@ The images are identical to `shinsenter/php:8.1-*` (Debian trixie, same extensio
 only the PHP core is patched. To audit an image without pulling it, read `PHP_URL` and
 `PHP_CVE_BACKPORT` from its config (`docker buildx imagetools inspect`).
 
-> ⚠️ **linux/arm64 only.** Because of the urgency, the images were compiled and published from an
-> arm64 machine. Other developers can build `linux/amd64` (natively on an amd64 host, or under
+> ⚠️ **linux/arm64 and Debian trixie only.** Because of the urgency, the images were compiled and
+> published from an arm64 machine, and only the Debian (trixie) flavour was built — there are no
+> `-alpine` or `-ubuntu` tags. Other developers can build `linux/amd64` (natively on an amd64 host, or under
 > QEMU, which is much slower) and push it to the same tags with:
 >
 > ```shell
