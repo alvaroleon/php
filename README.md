@@ -13,6 +13,7 @@ Our images support PHP versions from 5.6 up to 8.6 (RC), with variants for CLI, 
 
 ## Table of Contents <!-- omit from toc -->
 - [Introduction](#introduction)
+- [PHP 8.1 security backport (this fork)](#php-81-security-backport-this-fork)
 - [Docker Image Variants](#docker-image-variants)
 - [Customizing Settings via Environment Variables](#customizing-settings-via-environment-variables)
 - [Pre-installed PHP Extensions](#pre-installed-php-extensions)
@@ -42,6 +43,47 @@ These images are based on the [official PHP Docker images](https://hub.docker.co
 They include the latest Composer and common web servers - [Apache2](https://httpd.apache.org), [Nginx](https://nginx.org), [RoadRunner](https://roadrunner.dev), and [FrankenPHP](https://frankenphp.dev) - so you don't need to install them separately.
 
 > 🪶 Note: We slim these images down with the [docker-squash](https://code.shin.company/docker-squash) project, so pulls are faster and they use less disk and memory than the official images they're based on.
+
+
+## PHP 8.1 security backport (this fork)
+
+PHP 8.1 is end-of-life and has no official release with the fix for
+[CVE-2026-109618 / CVE-2026-109619](https://github.com/php/php-src/tree/PHP-8.1-CVE-2026-109618-109619);
+the official `php:8.1` images (and therefore `shinsenter/php:8.1-*`) ship the unpatched 8.1.34.
+This fork builds the same image chain on top of PHP compiled from the php-src backport branch
+(commit `1d7dec1`), reported as **`8.1.34-backport`**:
+
+| Image | Variants |
+|---|---|
+| `flownexai/php:8.1-<variant>` (floating) | `fpm`, `cli`, `fpm-apache`, `fpm-nginx` |
+| `flownexai/php:8.1.34-backport-20261022-<variant>` (immutable) | same |
+
+```shell
+docker run --rm flownexai/php:8.1-cli php -v          # PHP 8.1.34-backport
+docker run --rm flownexai/php:8.1-cli php -i | grep 'Build Provider'
+```
+
+The images are identical to `shinsenter/php:8.1-*` (Debian trixie, same extensions, same tooling);
+only the PHP core is patched. To audit an image without pulling it, read `PHP_URL` and
+`PHP_CVE_BACKPORT` from its config (`docker buildx imagetools inspect`).
+
+> ⚠️ **linux/arm64 only.** Because of the urgency, the images were compiled and published from an
+> arm64 machine. Other developers can build `linux/amd64` (natively on an amd64 host, or under
+> QEMU, which is much slower) and push it to the same tags with:
+>
+> ```shell
+> git submodule update --init build/docker-squash
+> PLATFORM=linux/amd64 ./build/cve-8.1/build.sh all
+> PLATFORM=linux/amd64 ./build/cve-8.1/verify.sh
+> PLATFORM=linux/amd64 PUSH=1 ./build/cve-8.1/build.sh push
+> ```
+>
+> Note that pushing a single-platform image to a tag replaces the existing manifest: to serve both
+> architectures under one tag, push with distinct tags (e.g. `-amd64`/`-arm64`) and combine them with
+> `docker buildx imagetools create -t flownexai/php:8.1-fpm flownexai/php:8.1-fpm-arm64 flownexai/php:8.1-fpm-amd64`.
+
+See [`build/cve-8.1/README.md`](build/cve-8.1/README.md) for the build recipe and
+[`CHANGELOG.md`](CHANGELOG.md).
 
 
 ## Docker Image Variants

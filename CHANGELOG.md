@@ -3,6 +3,19 @@
 All notable changes to this project will be documented in this file.
 
 
+## [Unreleased] - 2026-10-22 (fork: flownexai)
+- Add `build/cve-8.1/`: local build of PHP **8.1.34-backport** images with the fix for
+  [CVE-2026-109618 / CVE-2026-109619](https://github.com/php/php-src/tree/PHP-8.1-CVE-2026-109618-109619)
+  (PHP 8.1 is EOL and has no official release with the fix). Published as
+  `flownexai/php:8.1-{fpm,cli,fpm-apache,fpm-nginx}` and `flownexai/php:8.1.34-backport-20261022-<variant>`.
+- The patched source is released as `.tar.xz` at
+  https://github.com/alvaroleon/php/releases/tag/php-8.1.34-backport so that `phpaddmod` / IPE can rebuild
+  extensions from `PHP_URL`.
+- **linux/arm64 only** for now: the images were built on an arm64 machine as an emergency response.
+  Other developers can build and push `linux/amd64` with `PLATFORM=linux/amd64 ./build/cve-8.1/build.sh all`
+  (see `build/cve-8.1/README.md`).
+
+
 ## [5.8.0] - 2026-10-22
 - Replace the daily build with a watcher that builds only the images that changed.
 - Skip images that are already up to date.
