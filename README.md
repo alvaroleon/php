@@ -4,9 +4,9 @@
 > **This is a fork of [shinsenter/php](https://github.com/shinsenter/php), maintained only for PHP 8.1.**
 > Its single purpose is to publish `flownexai/php:8.1-*`: the same images with PHP 8.1.34 patched for
 > CVE-2026-109618 / CVE-2026-109619, which has no official release because PHP 8.1 is end-of-life
-> (see [PHP 8.1 security backport](#php-81-security-backport-this-fork)). The images are currently
-> **linux/arm64 only**, in Debian trixie and Alpine 3.22 flavours (no Ubuntu variant). For every other PHP
-> version use the upstream `shinsenter/php` images, which are
+> (see [PHP 8.1 security backport](#php-81-security-backport-this-fork)). The images are published for
+> **linux/amd64 and linux/arm64**, in **Debian trixie** and **Alpine 3.22** flavours (no Ubuntu variant).
+> For every other PHP version use the upstream `shinsenter/php` images, which are
 > kept up to date by the original author. Everything below this notice is the upstream documentation.
 
 Our images support PHP versions from 5.6 up to 8.6 (RC), with variants for CLI, ZTS, FPM, FPM/Apache, FPM/Nginx, RoadRunner, and FrankenPHP. Images are available for both Debian and Alpine.
@@ -72,25 +72,22 @@ docker run --rm flownexai/php:8.1-cli php -v          # PHP 8.1.34-backport
 docker run --rm flownexai/php:8.1-cli php -i | grep 'Build Provider'
 ```
 
-The images are identical to `shinsenter/php:8.1-*` (Debian trixie, same extensions, same tooling);
-only the PHP core is patched. To audit an image without pulling it, read `PHP_URL` and
+The images are identical to `shinsenter/php:8.1-*` / `shinsenter/php:8.1-*-alpine` (Debian trixie or
+Alpine 3.22, same extensions, same tooling); only the PHP core is patched. To audit an image without pulling it, read `PHP_URL` and
 `PHP_CVE_BACKPORT` from its config (`docker buildx imagetools inspect`).
 
-> ⚠️ **linux/arm64 only.** Because of the urgency, the images were compiled and published from an
-> arm64 machine. Debian (trixie) and Alpine (3.22, `OS=alpine` in the commands below) flavours are
-> built; there is no `-ubuntu` tag. Other developers can build `linux/amd64` (natively on an amd64 host, or under
-> QEMU, which is much slower) and push it to the same tags with:
->
-> ```shell
-> git submodule update --init build/docker-squash
-> PLATFORM=linux/amd64 ./build/cve-8.1/build.sh all
-> PLATFORM=linux/amd64 ./build/cve-8.1/verify.sh
-> PLATFORM=linux/amd64 PUSH=1 ./build/cve-8.1/build.sh push
-> ```
->
-> Note that pushing a single-platform image to a tag replaces the existing manifest: to serve both
-> architectures under one tag, push with distinct tags (e.g. `-amd64`/`-arm64`) and combine them with
-> `docker buildx imagetools create -t flownexai/php:8.1-fpm flownexai/php:8.1-fpm-arm64 flownexai/php:8.1-fpm-amd64`.
+**Platforms.** Every tag above is a multi-arch manifest for **linux/amd64** and **linux/arm64**;
+`docker pull` picks the right one. Each architecture is compiled natively (no QEMU) and published under a
+per-arch tag (`<tag>-amd64`, `<tag>-arm64`) that is then combined into the final tag, so rebuilding one
+architecture never replaces the other. There is no `-ubuntu` flavour. To rebuild a platform yourself:
+
+```shell
+git submodule update --init build/docker-squash
+PLATFORM=linux/amd64 ./build/cve-8.1/build.sh all      # OS=alpine for the Alpine flavour
+PLATFORM=linux/amd64 ./build/cve-8.1/verify.sh
+PLATFORM=linux/amd64 PUSH=1 ./build/cve-8.1/build.sh push   # pushes <tag>-amd64 only
+./build/cve-8.1/build.sh manifest                            # <tag> = <tag>-arm64 + <tag>-amd64
+```
 
 See [`build/cve-8.1/README.md`](build/cve-8.1/README.md) for the build recipe and
 [`CHANGELOG.md`](CHANGELOG.md).

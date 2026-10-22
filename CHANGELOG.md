@@ -15,9 +15,10 @@ All notable changes to this project will be documented in this file.
   from `build/cve-8.1/php-8.1-backport-alpine.dockerfile` (keeps the musl patch docker-library applies; the GH-14834
   hunk is applied with `sed` because it no longer matches 8.1.34).
 - Per-arch tags (`<tag>-arm64`, `<tag>-amd64`) and `build.sh manifest` to combine them into multi-arch tags.
-- **linux/arm64 only** for now: the images were built on an arm64 machine as an emergency response.
-  Other developers can build and push `linux/amd64` with `PLATFORM=linux/amd64 ./build/cve-8.1/build.sh all`
-  (see `build/cve-8.1/README.md`).
+- **Multi-arch**: all `flownexai/php:8.1*` tags (Debian trixie and Alpine 3.22) are manifest lists for
+  **linux/amd64** and **linux/arm64**. arm64 was compiled natively on Apple Silicon and amd64 natively on a
+  temporary x86 host, both on 2026-10-22; each architecture is published under `<tag>-<arch>` and combined with
+  `build.sh manifest` (see `build/cve-8.1/README.md`).
 
 
 ## [5.8.0] - 2026-10-22
