@@ -1,6 +1,13 @@
 # PHP Docker Images <!-- omit from toc -->
 📦 Lightweight PHP Docker images designed for easy customization and simple extension management.
 
+> **This is a fork of [shinsenter/php](https://github.com/shinsenter/php), maintained only for PHP 8.1.**
+> Its single purpose is to publish `flownexai/php:8.1-*`: the same images with PHP 8.1.34 patched for
+> CVE-2026-109618 / CVE-2026-109619, which has no official release because PHP 8.1 is end-of-life
+> (see [PHP 8.1 security backport](#php-81-security-backport-this-fork)). The images are currently
+> **linux/arm64 only**. For every other PHP version use the upstream `shinsenter/php` images, which are
+> kept up to date by the original author. Everything below this notice is the upstream documentation.
+
 Our images support PHP versions from 5.6 up to 8.6 (RC), with variants for CLI, ZTS, FPM, FPM/Apache, FPM/Nginx, RoadRunner, and FrankenPHP. Images are available for both Debian and Alpine.
 
 - Docker Hub: https://hub.docker.com/r/shinsenter/php
